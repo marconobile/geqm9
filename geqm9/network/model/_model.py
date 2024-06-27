@@ -12,7 +12,9 @@ from geqtrain.nn import (
 
 from geqm9.network.nn import (
     Head,
-    OutputScaler)
+    OutputScaler,
+    ScalarsMultiHeadSelfAttention
+)
 
 from geqtrain.nn import (
     OneHotAtomEncoding,
@@ -20,6 +22,7 @@ from geqtrain.nn import (
     SphericalHarmonicEdgeAngularAttrs,
     BasisEdgeRadialAttrs,
     ReadoutModule,
+    NodewiseReduce,
 )
 
 
@@ -46,7 +49,12 @@ def Model(
 
     layers = {
         # -- Encode --
-        "node_attrs":         EmbeddingNodeAttrs, #OneHotAtomEncoding,
+        "node_attrs": (
+            EmbeddingNodeAttrs,
+            dict(
+                embedding_dim = config['node_embedding_dims'],
+            )
+        ),
         "edge_radial_attrs":  BasisEdgeRadialAttrs,
         "edge_angular_attrs": SphericalHarmonicEdgeAngularAttrs,
     }
@@ -64,15 +72,6 @@ def Model(
                     # as requested in yaml but outs an hidden vector -> a repr for each edge
                 ),
             ),
-            # "pre_pooling_readout": (
-            #     ReadoutModule,
-            #     dict(
-            #         field=AtomicDataDict.EDGE_FEATURES_KEY,
-            #         out_field=AtomicDataDict.EDGE_FEATURES_KEY,
-            #         out_irreps=None,
-            #         eq_has_internal_weights=True,
-            #     ),
-            # ),
             "per_node_features": (
                 EdgewiseReduce, # takes all edges outgoing for node i and sum their features to get 1 feat vect of the node i itself
                 dict(
