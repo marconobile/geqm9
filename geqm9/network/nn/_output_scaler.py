@@ -47,7 +47,9 @@ class OutputScaler(GraphModuleMixin, torch.nn.Module):
         # if self.stds is not None:
         #     data[self.out_field] *= self.stds
 
-        if self.means is not None:
-            data[self.out_field] += self.means
+        # if self.means is not None:
+        #     data[self.out_field] += self.means
+
+        data[self.out_field] = torch.exp(data[self.out_field]) # map into [0, inf]
 
         return data
