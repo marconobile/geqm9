@@ -87,12 +87,12 @@ def Model(
                     out_field=DataDict.GRAPH_OUTPUT_KEY,
                 ),
             ),
-            "output_scaler": (
-                OutputScaler,
-                dict(
-                    out_field=DataDict.GRAPH_OUTPUT_KEY,
-                ),
-            ),
+            # "output_scaler": (
+            #     OutputScaler,
+            #     dict(
+            #         out_field=DataDict.GRAPH_OUTPUT_KEY,
+            #     ),
+            # ),
         }
     )
 
