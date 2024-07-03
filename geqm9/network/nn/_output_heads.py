@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import List, Optional, Union
 import torch
 from e3nn import o3
 from e3nn.util.jit import compile_mode
@@ -14,12 +14,7 @@ from torch_scatter import scatter
 class Head(GraphModuleMixin, torch.nn.Module):
 
     '''
-    I want to create a module that takes as input [B,N,k]
-    passes thru scalr mlp the kdimensional feat vect of each node N
-    and outs  a scalar. this is a single head,
-
-    then i need multiple heads
-
+    input shape [B,N,k]
     '''
 
     def __init__(
@@ -65,7 +60,7 @@ class Head(GraphModuleMixin, torch.nn.Module):
                 **head_function_kwargs,
             )
 
-        self.head._forward._weight_0_g.data *=.005
+        self.dropout = torch.nn.Dropout(.2)
 
     def forward(self, data: AtomicDataDict.Type) -> AtomicDataDict.Type:
 
@@ -77,6 +72,10 @@ class Head(GraphModuleMixin, torch.nn.Module):
 
         features = data[self.field]
         graph_feature = scatter(features, data[AtomicDataDict.BATCH_KEY], dim=0)
+
+        # dropout
+
+        graph_feature = self.dropout(graph_feature)
 
         # pass thru head
 
